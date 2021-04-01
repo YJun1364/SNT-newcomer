@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Widget 1</title>
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jstree/3.2.1/themes/default/style.min.css" />
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/1.12.1/jquery.min.js"></script>
+        <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/jstree/3.2.1/jstree.min.js"></script>
+
+        <!-- css 파일 import -->
+        <link rel="stylesheet" href="style.css" />
+
+        <!-- json 데이터 파일 import-->
+        <script src="data.json"></script>
+
+        <!-- jquery 파일 import-->
+        <script src="jquery.js"></script>
+    </head>
+    <body>
+        <button id="open-btn">Dialog open!</button>
+        <div id="list">
+            <header>
+                <div class="title-box"><span>조직검색</span></div>
+                <input type="text" id="search" />
+            </header>
+
+            <main id="tree"></main>
+
+            <footer>
+                <button type="reset" id="reset">취소</button>
+                <button type="submit" id="submit">확인</button>
+            </footer>
+        </div>
+    </body>
+</html>
