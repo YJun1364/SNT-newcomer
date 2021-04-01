@@ -11,7 +11,7 @@ $(function () {
     // Dialog 적용
     $('#list').dialog({
         autoOpen: false, // 숨기기
-        modal: true, //모달대화상자
+        modal: false, //모달대화상자
         position: 'center',
         show: {
             duration: 500,

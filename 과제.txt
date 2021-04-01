@@ -1,0 +1,14 @@
+
+
+1. javascript 튜토리얼 파일을 스터디 하면서 테스트 산출물 제출
+
+2. https://opentutorials.org/course/53/45  jquery  강좌11개 들으면서 테스트 산출물 제출
+
+http://www.w3big.com/ko/jqueryui/jqueryui-widget-factory-how.html 사용자 커스텀 위젯만들기 테스트 산출물 제출
+
+https://learn.jquery.com/jquery-ui/widget-factory/how-to-use-the-widget-factory/
+
+https://landsnail.tistory.com/entry/jQuery-Widget
+
+
+3. 개인별 커스텀 위젯 테스트 (개인별 제출 내용은 추후 안내)
