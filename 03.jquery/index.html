@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Document</title>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/1.12.1/jquery.min.js"></script>
+        <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+        <link rel="stylesheet" href="style.css" />
+        <script>
+            $(function () {
+                $.widget('lee.mydialog', $.ui.dialog, {
+                    options: {
+                        autoOpen: false, // 숨기기
+                        modal: false, //모달대화상자
+                        position: top,
+                        show: {
+                            duration: 500,
+                        },
+                        hide: {
+                            duration: 500,
+                        },
+                    },
+
+                    _create: function () {
+                        this.element = $('<button>', {
+                            text: 'testbutton',
+                            class: 'reset',
+                        });
+
+                        this.changer = $('<button>', {
+                            text: 'yaho',
+                            class: 'custom-colorize-changer',
+                        })
+                            .appendTo(this.element)
+                            .button()
+                            .css('height', '30px')
+                            .css('font-size', '15px');
+
+                        // Bind click events on the changer button to the random method
+                        this._on(this.changer, {
+                            // _on won't call random when widget is disabled
+                            click: 'random',
+                        });
+                        // this._refresh();
+                    },
+
+                    // open: function () {
+                    //     console.log(this.elemenet);
+                    //     var bar = $('<div></div>').appendTo('body');
+                    //     bar.css('height', '100px').css('backgrund-color', 'green');
+                    //     return this._super();
+                    //     var bar = $('<div></div>').appendTo('body');
+                    //     bar.css('height', '100px').css('backgrund-color', 'green');
+                    // },
+                });
+                $('#testDiv').mydialog();
+            });
+        </script>
+    </head>
+    <body>
+        <button id="testDiv"></button>
+    </body>
+</html>

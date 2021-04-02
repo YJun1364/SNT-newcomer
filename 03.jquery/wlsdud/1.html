@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>1</title>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/1.12.1/jquery.min.js"></script>
+        <script src="http://code.jquery.com/ui/1.10.4/jquery-ui.js"></script>
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jstree/3.2.1/themes/default/style.min.css" />
+        <link rel="stylesheet" href="http://code.jquery.com/ui/1.10.4/themes/smoothness/jquery-ui.css" />
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/jstree/3.2.1/jstree.min.js"></script>
+        <!-- <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script> -->
+        <!-- <script src="https://code.jquery.com/jquery-1.10.2.min.js"></script> -->
+        <script src="data.json"></script>
+        <script>
+            $(function () {
+                var defaultPlugins;
+                $.widget('custom.myDialog', $.ui.dialog, {
+                    options: {
+                        autoOpen: false, // 숨기기
+                        modal: false, //모달대화상자
+                        title: '조직 검색',
+                        position: top,
+                        width: 500,
+                        height: 700,
+                        show: {
+                            duration: 300,
+                        },
+                        hide: {
+                            duration: 300,
+                        },
+                        buttons: [
+                            {
+                                // 확인 - alert창 정보 출력
+                                text: '확인',
+                                click: function () {
+                                    var nodeID = $('#tree').jstree('get_checked'); //jstree('get_checked') : 체크된 노드의 id 값을 배열로 받아온다 nodeID 는 배열
+                                    // console.log(nodeID.length);
+                                    $('#search').val('');
+                                    if (nodeID.length == 0) {
+                                        alert('Are you checked?');
+                                    } else {
+                                        var message = ''; //[];
+                                        $.each(nodeID, function (index, items) {
+                                            // each 문 첫번째 인자 : 배열 객체 / 두번째 인자 콜백함수(index,item)
+                                            var nodeInfo = $('#tree').jstree('get_node', items).text; //jstree('get_node',nodeId) - 노드 id 로 노드정보를 검색하는 메소드
+                                            message += nodeInfo + '\n';
+                                        });
+                                        alert(message);
+                                    }
+                                },
+                            },
+
+                            {
+                                // 취소 - jstree reset
+                                text: '취소',
+                                click: function () {
+                                    $('#tree').jstree('deselect_all');
+                                    $('#search').val('');
+                                },
+                            },
+                        ],
+                    },
+                    _create: function () {
+                        $('#tree').jstree('open_all');
+                        this._super();
+                    },
+
+                    // create : function(){
+
+                    // }
+
+                    // jstree
+
+                    jstree: function () {
+                        var defaultPlugins = ['checkbox', 'search', 'wholerow'];
+                        var myTree = $('#tree').jstree({
+                            checkbox: {
+                                keep_selected_style: false,
+                            },
+                            plugins: defaultPlugins, // checkbox 와 search 플러그인 적용 whoerow -> 칸 나누는 효과
+                            core: { data: Parms },
+                        });
+                    },
+
+                    jstree_unchecked: function () {
+                        defaultPlugins = ['search', 'wholerow'];
+                        jstree();
+                    },
+                });
+                var bar = $('.hi').appendTo('body').myDialog();
+                bar.myDialog('open');
+                bar.myDialog('jstree'); //.jstree('open_all');
+                bar.myDialog('jstree_unchecked');
+            });
+        </script>
+    </head>
+    <body>
+        <div class="hi" id="hi">
+            <div id="tree"></div>
+        </div>
+        <!-- <button class="hi" id="hi">click</button> -->
+        <button title="gkgkgk"></button>
+    </body>
+</html>

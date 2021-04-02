@@ -10,5 +10,7 @@ https://learn.jquery.com/jquery-ui/widget-factory/how-to-use-the-widget-factory/
 
 https://landsnail.tistory.com/entry/jQuery-Widget
 
+https://learn.jquery.com/jquery-ui/widget-factory/
+
 
 3. 개인별 커스텀 위젯 테스트 (개인별 제출 내용은 추후 안내)
