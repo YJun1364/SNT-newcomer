@@ -36,7 +36,6 @@
 
         // dialogButton widget
         $.widget("custom.dialogButton", {
-          //default option
           defaultStyle: {
             cursor: "hand",
             "font-size": "2em",
@@ -62,10 +61,6 @@
         // dialogButton widget - end
 
         // myDialog widgetvar
-
-        // var _treeNode = $("#tree");
-        // var _searchNode = $("#search");
-
         $.widget("custom.myDialog", $.ui.dialog, {
           options: {
             autoOpen: false, // 숨기기
@@ -77,6 +72,7 @@
             show: {
               duration: 300,
             },
+
             hide: {
               duration: 300,
             },
@@ -86,7 +82,6 @@
                 text: "확인",
                 click: function () {
                   var nodeID = _treeNode.jstree("get_checked"); //jstree('get_checked') : 체크된 노드의 id 값을 배열로 받아온다 nodeID 는 배열
-                  // console.log(nodeID.length);
                   _searchNode.val("");
                   if (nodeID.length == 0) {
                     alert("Are you checked?");
@@ -112,13 +107,6 @@
               },
             ], // buttons
           },
-
-          //   _create: function () {
-          // this.dialogBtn = $("<button>", {
-          //   text: "Dialog Button",
-          //   class: "dialogbtn",
-          // });
-          //   },
         });
         // mydialog widget - end
 
@@ -156,7 +144,6 @@
   </head>
   <body>
     <div id="open-btn"></div>
-
     <div class="hi" id="hi">
       <input type="text" />
       <div id="tree"></div>
