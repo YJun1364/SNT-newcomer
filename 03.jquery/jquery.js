@@ -74,7 +74,7 @@ $(function () {
         }
         to = setTimeout(function () {
             var v = $('#search').val();
-            $('#tree').jstree(true).search(v);
+            $('#tree').jstree(true).search(v);  
         }, 250);
     });
 });

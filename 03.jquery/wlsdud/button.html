@@ -1,0 +1,535 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>button</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/1.12.1/jquery.min.js"></script>
+    <script src="http://code.jquery.com/ui/1.10.4/jquery-ui.js"></script>
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/jstree/3.2.1/themes/default/style.min.css"
+    />
+    <link
+      rel="stylesheet"
+      href="http://code.jquery.com/ui/1.10.4/themes/smoothness/jquery-ui.css"
+    />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jstree/3.2.1/jstree.min.js"></script>
+    <script src="data.json"></script>
+    <script>
+      /**
+       * $DataTable 컴포넌트
+       * dependency : Plugin
+       * @author 이동하
+       * @since 2013. 05. 21
+       */
+      $(function (window, $, undefined) {
+        //이미 클래스가 정의 되어있으면 정의하지 않는다.
+        if (typeof window.$DataTable != "undefined") {
+          return;
+        }
+
+        /* 의존 라이브러리 체크 */
+        if (typeof window.$Plugin == "undefined") {
+          alert("Please install Plugin library!!");
+          return;
+        }
+
+        /**
+         * DataTable 클래스
+         */
+        function $DataTable(params) {
+          $Plugin.call(this);
+
+          this.tableId;
+          this.rowTemplateId = ""; //row Template를 구성 (설정하지 않는 경우 해당 Id에 subfix로 RowTemplate 를 붙힘)
+          this.rowTemplateSource = ""; //javascript에서 HTML을 구성하는 경우 HTML소스
+          this.noTemplateId = ""; //데이터가 없는 경우의 Template를 구성 (설정하지 않는 경우 해당 Id에 subfix로 NoTemplate 를 붙힘)
+          this.noTemplateSource = ""; //javascript에서 HTML을 구성하는 경우 HTML소스
+          this.dataURL = ""; //서버로 부터 데이터를 생성하는 경우, 요청 URL
+          this.dataParams = []; //서버로 부터 데이터를 생성하는 경우, 요청 파라미터
+          this.viewRowCnt = 10; //페이지 마다 보여줄 갯수
+          this.sortField; //정렬 필드
+          this.sortType; //정렬 순서
+          this.currentPage = 1; //현재 선택된 페이지
+          this.perPage = 10; //페이지 갯수
+          this.addDataParams = null;
+          this.loadingText = $Globals.getMessage(
+            "public.msg.loading",
+            "데이터를 가져오는 중..."
+          );
+          this.bHash = true; //해쉬 사용여부
+          this.bHideHead = false;
+          this.useViewRowCnt = true;
+
+          $.extend(true, this, params || {});
+
+          // private or super overriding
+          this._currentPageCount = 0; //현재페이지 건수
+          this._totalCount = 0; //데이터 전체 갯수
+          this._startPage = 1; //시작 페이지
+          this._endPage = 1; //종료 페이지
+          this._totalPage = 1; //전체 페이지
+          this._colspan;
+          this._bBindEvent = false;
+        }
+
+        $.extend($DataTable.prototype, new $Plugin(), {
+          constructor: $DataTable,
+          _customInit: function () {
+            var _this = this;
+            this.tableId = this._jEl.attr("id");
+            if (this.rowTemplateId == "" && this.rowTemplateSource == "") {
+              this.rowTemplateId = "#" + this.tableId + "RowTemplate";
+            }
+            if (this.noTemplateId == "" && this.noTemplateSource == "") {
+              this.noTemplateId = "#" + this.tableId + "NoTemplate";
+            }
+            if (!this.sortField) {
+              this._jEl.find("thead a.sortTable").each(function () {
+                var _defaultSort = $(this).attr("defaultSort");
+                if (_defaultSort) {
+                  _this.sortField = $(this).attr("id");
+                  _this.sortType = $(this).attr("sort");
+                }
+              });
+            }
+            this._colspan = this._jEl.find("thead th").not(".noTitle").length; //사용하지않는 th를 위해 class noTitle 추가
+            this._jEl.find("#viewRowCnt").val(this.viewRowCnt);
+            this.render(this.addDataParams, true);
+
+            if (!this.useViewRowCnt) {
+              //this._jEl.find("#viewRowCnt").addClass("hidden_accessible");
+              this._jEl.find("#viewRowCnt").attr({ disabled: "disabled" });
+            }
+          },
+          bindEvent: function () {
+            var _this = this;
+
+            this._jEl
+              .find("thead")
+              .on("click", "a.sortTable", function (event) {
+                event.preventDefault();
+                _this.sortField = $(this).attr("id");
+                var sortType = $(this).attr("sort");
+                if (sortType == "DESC") {
+                  sortType = "ASC";
+                } else {
+                  sortType = "DESC";
+                }
+                $(this).attr("sort", sortType);
+                _this.sortType = sortType;
+
+                if (sortType == "ASC") {
+                  $(this)
+                    .find("img")
+                    .attr(
+                      "src",
+                      $ServerInfo.contextPath +
+                        "/images/UXDesign/icon/ic_tablesort_sel_up.gif"
+                    );
+                } else {
+                  $(this)
+                    .find("img")
+                    .attr(
+                      "src",
+                      $ServerInfo.contextPath +
+                        "/images/UXDesign/icon/ic_tablesort_sel_down.gif"
+                    );
+                }
+
+                _this.trigger("onHashChange", "sortField"); //hashChange 트리거를 발생시킴
+
+                if (!_this.bHash) {
+                  _this.render();
+                }
+              })
+              .on("change", "input:checkbox", function () {
+                var _chr = !$(this).attr("checked");
+                _this._changeInput($("tbody tr", _this._jEl), _chr);
+                $(this).attr("checked", _chr);
+              });
+
+            this._jEl.find("tbody").on("change", "input:checkbox", function () {
+              var _chr = !!$(this).attr("checked");
+              if (_chr) {
+                _this._changeInput($(this).parents("tr"), false);
+              } else {
+                _this._changeInput($(this).parents("tr"), true);
+              }
+            });
+
+            this._jEl.find("#pageNumArea").on("click", "a", function (event) {
+              event.preventDefault();
+              if ($(this).hasClass("disabled")) {
+                return;
+              }
+              var _jLi = $(this).parent();
+              if (_jLi.hasClass("btn_page_first")) {
+                _this.currentPage = 1;
+              } else if (_jLi.hasClass("btn_page_pre")) {
+                var _temp = _this._startPage - _this.perPage;
+                if (_temp >= 1) {
+                  _this.currentPage = _temp;
+                }
+              } else if (_jLi.hasClass("btn_page_next")) {
+                var _temp = _this._startPage + _this.perPage;
+                _this.currentPage = _this._startPage + _this.perPage;
+                if (_temp <= _this._totalPage) {
+                  _this.currentPage = _temp;
+                }
+              } else if (_jLi.hasClass("btn_page_last")) {
+                _this.currentPage = _this._totalPage;
+              } else {
+                _this.currentPage = Number(_jLi.text());
+              }
+
+              _this.trigger("onHashChange", "currentPage"); //hashChange 트리거를 발생시킴
+
+              if (!_this.bHash) {
+                _this.render();
+              }
+            });
+
+            this._jEl.find("#viewRowCnt").bind("change", function (event) {
+              _this.trigger(
+                "onHashChange",
+                "viewRowCnt",
+                Number($(this).val())
+              ); //hashChange 트리거를 발생시킴
+
+              if (!_this.bHash) {
+                _this.render();
+              }
+            });
+
+            this._bBindEvent = true;
+          },
+          _renderSort: function () {
+            var _this = this;
+            this._jEl.find("thead a.sortTable").each(function () {
+              var sortField = $(this).attr("id");
+              var sortType = "DESC";
+              if (_this.sortField == sortField) {
+                sortType = _this.sortType;
+                if (sortType == "ASC") {
+                  $(this)
+                    .find("img")
+                    .attr(
+                      "src",
+                      $ServerInfo.contextPath +
+                        "/images/UXDesign/icon/ic_tablesort_sel_up.gif"
+                    );
+                } else {
+                  $(this)
+                    .find("img")
+                    .attr(
+                      "src",
+                      $ServerInfo.contextPath +
+                        "/images/UXDesign/icon/ic_tablesort_sel_down.gif"
+                    );
+                }
+              } else {
+                $(this)
+                  .find("img")
+                  .attr(
+                    "src",
+                    $ServerInfo.contextPath +
+                      "/images/UXDesign/icon/ic_tablesort_down.gif"
+                  );
+              }
+              $(this).attr("sort", sortType);
+            });
+          },
+          _renderError: function (jBody) {
+            return $(
+              "<tr><td class='tx_warnning'>" +
+                $Globals.getMessage(
+                  "public.msg.unknownError",
+                  "알 수 없는 오류가 발생하였습니다. 관리자에게 문의하세요."
+                ) +
+                "</td></tr>"
+            )
+              .appendTo(jBody)
+              .find("td")
+              .attr("colspan", this._colspan);
+          },
+          _renderLoading: function (jBody) {
+            return $(
+              '<tr id="loadingRow"><td><img src="' +
+                $Globals.webRoot +
+                '/images/ui/icon-throbber.gif" />&#160;' +
+                this.loadingText +
+                "</td></tr>"
+            )
+              .appendTo(jBody)
+              .find("td")
+              .attr("colspan", this._colspan);
+          },
+          _removeLoading: function () {
+            $("#loadingRow", this._jEl).remove();
+          },
+          _changeInput: function (jTr, bChecked) {
+            jTr.each(function () {
+              var _jInput = $(this).find("input:checkbox");
+              if (_jInput.length > 0) {
+                if (bChecked) {
+                  $(this).addClass("bgSelected");
+                } else {
+                  $(this).removeClass("bgSelected");
+                }
+                _jInput.attr("checked", bChecked);
+                _jInput[0].checked = bChecked;
+              }
+            });
+          },
+          render: function (addDataParams, isInit) {
+            var _this = this;
+
+            $Globals.addParam(this.dataParams, "currentPage", this.currentPage);
+            $Globals.addParam(this.dataParams, "viewRowCnt", this.viewRowCnt);
+            $Globals.addParam(this.dataParams, "sortField", this.sortField);
+            $Globals.addParam(this.dataParams, "sortType", this.sortType);
+            $Globals.addParams(this.dataParams, addDataParams || []);
+
+            if (_this.bHideHead) {
+              //thead 숨기기 옵션추가
+              $("thead", _this._jEl).addClass("hidden");
+              $(".blockListTableBody", _this._jEl).css("top", "0px");
+            }
+
+            var _jBody = $("tbody", _this._jEl);
+            _jBody.children().remove();
+            _this._renderLoading(_jBody);
+            if (!_this._bBindEvent) {
+              _this.bindEvent();
+            }
+
+            $Globals.isAuthenticated(function () {
+              var xhr = $Globals.ajax(_this.dataURL, _this.dataParams);
+              xhr.success(function (res) {
+                if (res.success) {
+                  _this._totalCount = res.totalCount;
+                  _this._renderSort();
+                  if (res.data && res.data.length > 0) {
+                    _this._currentPageCount = res.data.length;
+
+                    for (var i = 0; i < res.data.length; i++) {
+                      var rowHtml = "";
+                      if (_this.rowTemplateSource != "") {
+                        rowHtml = _this.rowTemplateSource;
+                      } else {
+                        rowHtml = $T(_this.rowTemplateId);
+                      }
+                      var rowData = res.data[i];
+                      if (_this.changeRowDataValue) {
+                        _this.trigger("changeRowDataValue", rowData);
+                      }
+                      for (var rowName in rowData) {
+                        rowHtml = rowHtml.replace(
+                          eval("/\{" + rowName + "}/g"),
+                          $StringUtil.checkNull(rowData[rowName])
+                        );
+                      }
+                      var jRow = $(rowHtml)
+                        .appendTo(_jBody)
+                        .data("rowData", rowData);
+
+                      _this.trigger("onAfterRenderRow", jRow, rowData);
+                    }
+                  } else {
+                    _this._currentPageCount = 0;
+                    var rowHtml = "";
+                    if (_this.noTemplateSource != "") {
+                      rowHtml = _this.noTemplateSource;
+                    } else {
+                      rowHtml = $T(_this.noTemplateId);
+                    }
+                    $(rowHtml)
+                      .appendTo(_jBody)
+                      .find("td")
+                      .attr("colspan", _this._colspan);
+                  }
+
+                  _this.trigger("onCustomEvent", _this._jEl);
+
+                  if (isInit) {
+                    _this.trigger("onLoad", _this._jEl);
+                  }
+                  _this._renderNav();
+                } else {
+                  _this._renderError(_jBody);
+                }
+              });
+              xhr.error(function (log) {
+                _this._renderError(_jBody);
+              });
+              xhr.complete(function () {
+                _this._removeLoading();
+              });
+            });
+          },
+          setViewRowCnt: function (viewRowCnt) {
+            this.viewRowCnt = viewRowCnt;
+          },
+          setCurrentPage: function (currentPage) {
+            this.currentPage = currentPage;
+          },
+          setSortField: function (sortField, sortType) {
+            this.sortField = sortField;
+            this.sortType = sortType;
+          },
+          /**
+           * 네비게이션을 랜더링 한다.
+           */
+          _renderNav: function () {
+            var _jNav = $("#pageNavArea", this._jEl);
+            //네비게이션 이 존재하는 경우
+            if (_jNav.length > 0) {
+              this._setPage();
+              var _jNavArea = _jNav.find("#pageNumArea");
+              if (this._totalCount > 0) {
+                _jNavArea.children().remove();
+                _jNavArea.text("");
+                _jNavArea.append(
+                  '<li class="btn_page btn_page_first"><a href="#a" title="' +
+                    $Globals.getMessage("public.ui.moveFirst", "맨처음") +
+                    '"><span>&#160;</span></a></li>'
+                );
+                _jNavArea.append(
+                  '<li class="btn_page btn_page_pre"><a href="#a" title="' +
+                    $Globals.getMessage("public.ui.movePrev", "이전") +
+                    '"><span>&#160;</span></a></li>'
+                );
+                for (var i = this._startPage; i <= this._endPage; i++) {
+                  if (this.currentPage == i) {
+                    $(
+                      '<li class="selected"><a href="#a"><span>' +
+                        i +
+                        "</span></a></li>"
+                    ).appendTo(_jNavArea);
+                  } else {
+                    $(
+                      '<li><a href="#a"><span>' + i + "</span></a></li>"
+                    ).appendTo(_jNavArea);
+                  }
+                }
+                _jNavArea.append(
+                  '<li class="btn_page btn_page_next"><a href="#a" title="' +
+                    $Globals.getMessage("public.ui.moveNext", "다음") +
+                    '"><span>&#160;</span></a></li>'
+                );
+                _jNavArea.append(
+                  '<li class="btn_page btn_page_last"><a href="#a" title="' +
+                    $Globals.getMessage("public.ui.moveLast", "맨끝") +
+                    '"><span>&#160;</span></a></li>'
+                );
+
+                if (this._startPage < this.perPage) {
+                  $("li.btn_page_pre a", _jNavArea).addClass("disabled");
+                  if (this._startPage == this.currentPage) {
+                    $("li.btn_page_first a", _jNavArea).addClass("disabled");
+                  }
+                }
+
+                if (
+                  parseInt((this.currentPage - 1) / this.perPage) ==
+                  parseInt(this._totalPage / this.perPage)
+                ) {
+                  $("li.btn_page_next a", _jNavArea).addClass("disabled");
+                  if (this.currentPage == this._totalPage) {
+                    $("li.btn_page_last a", _jNavArea).addClass("disabled");
+                  }
+                }
+              } else {
+                _jNavArea.children().remove();
+              }
+              _jNav.find("#totalCount").text(this._totalCount);
+            }
+          },
+          /**
+           * 네이비게이션 사용시 페이지 값 설정
+           */
+          _setPage: function () {
+            if (this._totalCount % this.viewRowCnt == 0) {
+              this._totalPage = parseInt(this._totalCount / this.viewRowCnt);
+            } else {
+              this._totalPage = parseInt(
+                this._totalCount / this.viewRowCnt + 1
+              );
+            }
+            if (this._totalPage == 0) this._totalPage = 1;
+
+            if (this.currentPage % this.perPage == 0) {
+              this._startPage = parseInt(this.currentPage / this.perPage - 1);
+            } else {
+              this._startPage = parseInt(this.currentPage / this.perPage);
+            }
+            this._startPage = this._startPage * this.perPage + 1;
+            this._endPage =
+              this._startPage + this.perPage - 1 >= this._totalPage
+                ? this._totalPage
+                : this._startPage + this.perPage - 1;
+          },
+          getCheckedData: function (type) {
+            var _ret = [];
+            var _jBody = $("tbody", this._jEl);
+            if (!type) {
+              type = "checkbox";
+            }
+            _jBody.find("input[type='" + type + "']:checked").each(function () {
+              _ret.push($(this).parent().parent().data("rowData"));
+            });
+            return _ret;
+          },
+          getAllRowData: function () {
+            //현재 보여지는 페이지 데이터를 가져온다
+            var _ret = [];
+            if (this._totalCount > 0) {
+              var _jBody = $("tbody", this._jEl);
+              _jBody.find("tr").each(function () {
+                _ret.push($(this).data("rowData"));
+              });
+            }
+            return _ret;
+          },
+          getRow: function (id) {
+            if (this._totalCount > 0) {
+              var _jBody = $("tbody", this._jEl);
+              return _jBody.find("#" + id);
+            }
+            return null;
+          },
+          getLastRow: function () {
+            if (this._totalCount > 0) {
+              var _jBody = $("tbody", this._jEl);
+              return _jBody.find("tr:last");
+            }
+            return null;
+          },
+          setDisableAllCheck: function () {
+            $("thead input:checked", this._jEl).each(function () {
+              this.checked = false;
+            });
+            this._changeInput($("tbody tr", this._jEl), false);
+          },
+          getTotalCount: function () {
+            return this._totalCount;
+          },
+          getViewCnt: function () {
+            return this.viewRowCnt;
+          },
+        });
+
+        window.$DataTable = $DataTable;
+
+        //Plugin을 등록한다
+        $.PluginBuilder.build("sntDataTable", $DataTable);
+      })(window, window.jQuery);
+    </script>
+  </head>
+  <body>
+    <div class="test"></div>
+  </body>
+</html>
