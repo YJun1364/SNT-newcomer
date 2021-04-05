@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>1</title>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/1.12.1/jquery.min.js"></script>
+        <script src="http://code.jquery.com/ui/1.10.4/jquery-ui.js"></script>
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jstree/3.2.1/themes/default/style.min.css" />
+        <link rel="stylesheet" href="http://code.jquery.com/ui/1.10.4/themes/smoothness/jquery-ui.css" />
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/jstree/3.2.1/jstree.min.js"></script>
+
+        <!-- json data  -->
+        <script src="data.json"></script>
+
+        <script src="jquery.js"></script>
+        <script>
+            $(function () {
+                $('.hi').myDialog(); // dialogButton에서 사용함
+
+                //클릭 호출
+                $('#open-btn').dialogButton();
+                $('#open-btn').dialogButton('clickAction', $('.hi'));
+                $('#open-btn').dialogButton('toggleOff');
+            });
+        </script>
+    </head>
+    <body>
+        <div id="open-btn"></div>
+        <div class="hi" id="hi">
+            <input id="search" type="text" />
+            <div id="tree"></div>
+        </div>
+    </body>
+</html>
