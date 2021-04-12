@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Document</title>
+        <!-- 	jquery 추가 -->
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/1.12.1/jquery.min.js"></script>
+        <script src="http://code.jquery.com/ui/1.10.4/jquery-ui.js"></script>
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jstree/3.2.1/themes/default/style.min.css" />
+        <link rel="stylesheet" href="http://code.jquery.com/ui/1.10.4/themes/smoothness/jquery-ui.css" />
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/jstree/3.2.1/jstree.min.js"></script>
+
+        <!-- custom jquery import -->
+        <script type="text/javaScript" src="data.json"></script>
+        <script type="text/javaScript" src="jquery_custom.js"></script>
+        <script>
+            $(function () {
+                $('#open-btn').on('click', function () {
+                    $('#hi').writerDialog();
+                    $('#tree').jstree();
+                });
+                $('#css').on('click', function () {
+                    window.open('hi.html', 'hi!', 'height=40');
+                });
+            });
+        </script>
+        <style type="text/css">
+            .hi {
+                display: none;
+            }
+            #date {
+                appearance: none;
+                -webkit-appearance: none;
+            }
+            .textbox-n {
+                width: 150px;
+            }
+        </style>
+    </head>
+    <body>
+        <button id="open-btn">test-btn</button>
+        <div class="hi" id="hi">
+            <input id="jstree-search" type="text" />
+            <div id="tree">ㅎㅗㅎ</div>
+        </div>
+        <input id="target" type="text" />
+        <input type="date" id="date" />
+        <input class="textbox-n" type="text" onfocus="(this.type='date')" onblur="(this.type='text')" id="date" />
+        <button id="css"></button>
+    </body>
+</html>

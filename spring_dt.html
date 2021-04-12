@@ -7,7 +7,71 @@
         <title>Document</title>
     </head>
     <body>
-        <div class="buttonDiv"><button>등록</button><button>수정</button><button>삭제</button><button>인쇄</button></div>
-        <div class="data-table"></div>
+        <div id="search">
+            <ul>
+                <!-- 제목 -->
+                <li>
+                    <spring:message code="title.text" /> <label for="searchKeyword" style="visibility: hidden; display: none"><spring:message code="search.keyword" /></label>
+                    <form:input path="searchKeyword" cssClass="txt" />
+                </li>
+                <br />
+                <li id="writer">
+                    <!-- 작성자 -->
+                    <spring:message code="title.writer" /> <label for="searchKeyword" style="visibility: hidden; display: none"><spring:message code="search.keyword" /></label>
+                    <form:input path="searchKeyword" cssClass="txt" />
+                    <span class="btn_blue_2">
+                        <a id="open-btn" href="javascript:fn_dialog();" href="#"><spring:message code="button.jstree" /></a>
+                        <img src="<c:url value='/images/egovframework/example/btn_bg_r.gif'/>" style="margin-left: 6px" alt="" />
+                    </span>
+                    <!-- 부서 -->
+                    <spring:message code="title.dept" /> <label for="searchKeyword" style="visibility: hidden; display: none"><spring:message code="search.keyword" /></label>
+                    <form:input path="searchKeyword" cssClass="txt" />
+                    <span class="btn_blue_2">
+                        <a href="#"><spring:message code="button.jstree" /></a> <img src="<c:url value='/images/egovframework/example/btn_bg_r.gif'/>" style="margin-left: 6px" alt="" />
+                    </span>
+                </li>
+
+                <!-- 작성일 -->
+                <li id="regdate_first">
+                    <spring:message code="title.regdate" />
+                    <!-- first 달력 -->
+                    <form name="Form1" action="<c:url value='/sym/cmm/EgovNormalCalPopup.do'/>" method="post">
+                        <input type="hidden" name="sDate" value="" size="8" readonly onClick="javascript:fn_egov_NormalCalendar(document.Form1, document.Form1.sDate, document.Form1.vDate);" />
+                        <input type="text" name="vDate" value="" size="10" readonly onClick="javascript:fn_egov_NormalCalendar(document.Form1, document.Form1.sDate, document.Form1.vDate);" />
+                        <img
+                            src="<c:url value='images/egovframework/cmmn/btn_page_next1.gif' />"
+                            onClick="javascript:fn_egov_NormalCalendar(document.Form1, document.Form1.sDate, document.Form1.vDate);"
+                        />
+                    </form>
+                </li>
+                <li><span id="regdate_middle">~</span></li>
+                <li id="regdate_second">
+                    <form name="Form1" action="<c:url value='/sym/cmm/EgovNormalCalPopup.do'/>" method="post">
+                        <input type="hidden" name="sDate" value="" size="8" readonly onClick="javascript:fn_egov_NormalCalendar(document.Form1, document.Form1.sDate, document.Form1.vDate);" />
+                        <input type="text" name="vDate" value="" size="10" readonly onClick="javascript:fn_egov_NormalCalendar(document.Form1, document.Form1.sDate, document.Form1.vDate);" />
+                        <img
+                            src="<c:url value='images/egovframework/cmmn/btn_page_next1.gif' />"
+                            onClick="javascript:fn_egov_NormalCalendar(document.Form1, document.Form1.sDate, document.Form1.vDate);"
+                        />
+                    </form>
+                </li>
+            </ul>
+            <ul>
+                <!-- 검색 -->
+                <li>
+                    <span class="btn_blue_l">
+                        <a href="javascript:fn_egov_addView();"><spring:message code="button.search" /></a>
+                        <img src="<c:url value='/images/egovframework/example/btn_bg_r.gif'/>" style="margin-left: 6px" alt="" />
+                    </span>
+                </li>
+                <!-- 초기화 -->
+                <li>
+                    <span class="btn_blue_l">
+                        <a href="javascript:fn_egov_addView();"><spring:message code="button.reset" /></a>
+                        <img src="<c:url value='/images/egovframework/example/btn_bg_r.gif'/>" style="margin-left: 6px" alt="" />
+                    </span>
+                </li>
+            </ul>
+        </div>
     </body>
 </html>

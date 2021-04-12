@@ -1,6 +1,6 @@
 $(function () {
-    var _searchNode = $('#search');
-    var _treeNode = $('#tree').jstree({
+    var _searchNode = $('#jstree-search');
+    var _treeNode = $('#').jstree({
         plugins: ['checkbox', 'search', 'wholerow'], // checkbox 와 search 플러그인 적용 whoerow -> 칸 나누는 효과
         checkbox: {
             keep_selected_style: false,
