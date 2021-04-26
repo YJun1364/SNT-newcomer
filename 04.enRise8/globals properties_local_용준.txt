@@ -1,0 +1,191 @@
+#------------------------------------------------------------------------
+#
+#   Globals.properties : 시스템 속성 설정 파일 
+#   
+#--------------------------------------------------------------------------
+#   1.  key = value 구조입니다.
+#   2.  key값은 공백문자를 포함하면 안 되나 value값은 공백문자를 가질 수 있습니다.
+#   3.  key값으로 한글을 사용할 수 없고 value값은 한글사용이 가능합니다.
+#   4.  줄을 바꿀 필요가 있으면 '\'를 라인의 끝에 추가하시오.
+#   5.  '\'문자를 사용할 필요가 있다면 '\\'를 사용하시오.
+#   6.  Windows에서의 디렉토리 표시 : '\\' or '/'  ( not '\')
+#   7.  Unix에서의 디렉토리 표시 : '/'
+#   8.  주석문 처리는  #사용
+#   9.  서블릿에서 참조하는 value와 어플리케이션에서 참조하는 value값은 서로 값은 값을 참조하는
+#       경우라고 하더라도 서로 같지 않은 값이다.
+#       1)서블릿에서 참조시 : value값뒤에 붙어있는 공백문자는 value 에러를 발생시킨다.
+#                             eg) music.period.baroque.genre.vocal.favorite = Cantata"space" //-> caution
+#                             따라서 SAFLogConfiguration.getConfValue()를 이용해 얻은 값은
+#                             trim()메쏘드를 사용해 처리한 후 참조해야 한다.
+#       2)어플리케이션에서 참조시 : value값뒤에 붙어있는 공백문자는 차이를 만들지 않는다.
+#-----------------------------------------------------------------------------------------------------------
+
+########################################################################################
+# 프로젝트시 변경해야 할 부분 START ----------------------------------------------------------
+# 서버의 IP와 Port
+Globals.SERVER_IP = 127.0.0.1
+Globals.SERVER_DOMAIN = 127.0.0.1
+Globals.SERVER_PORT = 80
+
+#전자결재 서버
+Globals.APVL_SERVER_IP = 127.0.0.1
+Globals.APVL_SERVER_DOMAIN = 127.0.0.1
+Globals.APVL_SERVER_PORT = 80
+
+# File(사진,첨부파일등)이  저장되는 Root 디렉토리
+#Globals.UPLOAD_FILE_DIR = C:/projects/enrisemd/efiles/
+Globals.UPLOAD_FILE_DIR = /home/ekpmd/enrise/efiles/
+Globals.MIS_UPLOAD_FILE_DIR = D:/projects/enrise8/efiles/
+
+# File(사진,첨부파일등)이  저장되는 Root 디렉토리
+Globals.LEGACY_UPLOAD_FILE_DIR = D:/projects/enrise8/efiles/data1/server/
+Globals.OLD_DOC_UPLOAD_FILE_DIR = D:/projects/enrise8/efiles/data1/web_doc/
+Globals.PORTAL_UPLOAD_FILE_DIR = D:/projects/enrise8/efiles/
+Globals.PDF_UPLOAD_FILE_DIR = D:/projects/enrise8/efiles_pdf/ConvertFiles/
+Globals.WEBHWP_UPLOAD_FILE_DIR = /home/ekpmd/data-webhwp/save/
+
+#PDF 선 변환 디렉토리 (배치)
+Globals.PDF_CONVERT_FILE_DIR = D:/projects/enrise8/efiles_pdf/userUpload/priority/
+
+#메일
+Globals.MAIL_DOMAIN = @esnt.co.kr
+
+#Globals.DbType = mysql
+#Globals.DriverClassName = com.mysql.jdbc.Driver
+#Globals.DBServerUrl = jdbc:mysql://127.0.0.1:3306/enrise8
+#Globals.UserName = enrise8
+#Globals.Password = enrise8
+
+Globals.DbType = oracle
+Globals.DriverClassName = oracle.jdbc.driver.OracleDriver
+Globals.DBServerUrl = jdbc:oracle:thin:@210.94.62.134:1522:orclmd
+Globals.UserName = c##ekpdev
+Globals.Password = ekpdev
+Globals.MaxIdle = 20
+Globals.MaxActive = 20
+
+Globals.SMTP_SERVER = webmail.krri.re.kr
+Globals.SMTP_PORT = 25
+Globals.SMTP_SERVER_NAME = dev
+Globals.SMTP_ADMIN_NAME = admin
+Globals.SMTP_ADMIN_EMAIL = admin@krri.re.kr
+
+#스케줄 서버
+Globals.IS_SCHEDULE_SERVER = Y
+Globals.SCHEDULE_SERVER_URL = http://127.0.0.1
+Globals.SCHEDULE_SERVER_IP = 127.0.0.1
+
+#통합정보시스템 서버
+#Globals.MIS_SERVER_IP = 1.241.69.140
+Globals.MIS_SERVER_IP = erp.krri.re.kr
+Globals.MIS_SERVER_PORT = 7001
+
+#문서뷰어 서버
+Globals.VIEWER_SERVER_IP = conv.krri.re.kr
+Globals.VIEWER_SERVER_PORT = 80
+
+#문서변환 서버
+Globals.CONVERT_SERVER_IP = conv.krri.re.kr
+Globals.CONVERT_SERVER_PORT = 57158
+
+#메신저 서버
+Globals.MES_SERVER_IP = 192.168.110.132
+Globals.MES_SERVER_PORT = 12551
+
+#통합검색 서버
+Globals.SEARCH_SERVER_IP = 210.94.62.134
+Globals.SEARCH_SERVER_PORT = 8080
+
+#REST SERVER 키
+Globals.REST_SERVER_APIKEY = TsaoLtkCzswaCpWXutTQsyUAXGNLNzuJIrFIrTshWFJKTJdgLQQrCpwCpdmUvyrHXBIcbDVnEZkWeBRgSOYPfsiAsYIDBstgMLZe
+Globals.REST_SERVER_CODE = EIP
+
+#기본 테마 스킨
+Globals.DEFAULT_SKIN = krri_skin
+#기본 포틀릿 테마
+Globals.DEFAULT_PORTLET_THEME = basic
+
+#모든 메뉴가 동시에 적용되도록 설정 N인 경우 각 메뉴별로 설정됨
+Globals.IS_ALL_SKIN = Y
+# 프로젝트시 변경해야 할 부분 END ----------------------------------------------------------
+########################################################################################
+
+# 시스템 타입과 이름
+Globals.SYSTEM_TYPE = EKP
+Globals.SYSTEM_NAME = enRiseOffice(v8.0)
+
+# 시스템 캐릭터 세트
+Globals.CHARSET = utf-8
+
+# LDAP 접속환경
+Globals.LDAP.USE = Y
+Globals.LDAP.SERVER_IP = ldap.gcc.go.kr
+Globals.LDAP.SERVER_PORT = 389
+Globals.LDAP.BASE_DN = o=Government of Korea,c=KR
+Globals.LDAP.BASE_SORT = ouorder
+
+#전자문서 유통 디렉토리 efiles 하위 경로
+Globals.RELAY.RECEIVE_ERROR_DIR = D:/projects/enrise8/efiles/relay/data/receiver/
+Globals.RELAY.SEND_DIR = D:/projects/enrise8/efiles/relay/data/sendtemp/
+Globals.RELAY.RECEIVE_TEMP_DIR = D:/projects/enrise8/efiles/relay/data/receivetemp/
+Globals.RELAY.RECEIVE_DIR = D:/projects/enrise8/efiles/relay/data/receive/
+Globals.RELAY.SCHEMA_DIR = D:/projects/enrise8/efiles/relay/schema/
+Globals.RELAY.DTD_VER = 2.0
+Globals.RELAY.XSL_VER = 2.0
+#Globals.RELAY.PKI_PROPERTIES_FILE = /relay/properties/pki.properties
+#Globals.RELAY.ORG_NAME = SsangYong Information & Communications Corp.
+#Globals.RELAY.TYPE = relay 
+#Globals.RELAY.INTERVAL_TIME = 10
+
+#중복로그인 가능여부
+Globals.IS_DUP_LOGIN=Y
+
+# SSO 로그인 유무여부 (Y or N)
+Globals.IS_SSO_LOGIN_MODE = N
+
+#관리자 비밀번호로 로그인 사용 여부
+Globals.USE_ADMIN_PASSWORD = Y
+
+#관리자 비밀번호
+Globals.ADMIN_PASSWORD = 1234qwer
+
+#모바일 사용 여부
+Globals.USE_MOBILE = Y
+
+#설문조사 승인기능 사용 여부
+Globals.USE_POLL_APPROVE = Y
+
+#메신저 사용 여부
+Globals.USE_MES = N
+
+#결재연동 시점정보 적용 여부
+Globals.INFC_APVL_TIME = N
+
+#서식 본문 형식
+Globals.DOCBODY_TYPE_CD = webhwp
+
+#공공기관 여부
+Globals.PUBLIC_INSTITUTION = Y
+
+#단위업무 기능분류 사용 여부
+Globals.USE_ABILITY = N
+
+#전자결재 사용 시작 년도(회계년도 기준)
+Globals.START_YEAR = 2017
+
+#사이냅소프트 문서변환
+Globals.SYNAP_EXE_DIR = D:/projects/enrise8/synap/
+Globals.SYNAP_EXE_NAME = sn3hcv.exe
+Globals.SYNAP_WEBROOT_DIR =D:/projects/enrise8/workspace/enRiseEip/src/main/webapp/
+Globals.SYNAP_FILE_DIR = sfiles/
+
+#GCM API KEY
+#Google SNT 계정에 사이트별 프로젝트 생성 및 API키 발급
+Globals.GCM_API_KEY = AIzaSyAqnCtYtyQ23V6DpCq5hU-8xrrPTUy7Trs
+
+#APNS 
+Globals.APNS_KEY_STORE = 
+Globals.APNS_PASSWORD =
+
+#CORS
+Globals.CORS_URL = http://192.168.110.138,http://192.168.110.140:7001,http://portal.krri.re.kr,http://erp.krri.re.kr:7001

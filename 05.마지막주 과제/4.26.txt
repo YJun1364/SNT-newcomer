@@ -1,0 +1,29 @@
+doReceipt
+workApprovallineDAO.insertWorkApprovalline - 업무결재선 insert
+	WORK_APPROVALLINE - 부서결재선
+workApprovalInfoDAO.insertWorkApprovalInfo - 결재 정보 insert
+	WORK_APPROVAL_INFO  -부서 결재정보
+approvallineService.insertApprovalline - 결재선 정보 insert
+	approvallineDAO.insertApprovalline  
+		- APPROVALLINE  - 총결재선정보
+
+공람자 
+ApvlExhibitInfo.insertExhibitInfo
+	EXHIBIT_INFO - 공람자 정보 insert
+
+발송대기
+AARSDOCUMENT 에서 정보 불러옴
+SEND_FOLDER_INFO 발송 포더 정보 
+FORM_LIST	서식정보
+FORM_CLASS	서식분류
+
+
+발송
+send에서
+sendInternal 메서드이용 
+multiDraftdocumentDAO.insertMultiDraftdocument
+	MULTI_DRAFTDOCUMENT
+draftDocumentDAO.insertDraftdocument
+	DRAFTDOCUMENT
+
+approvallinePopup

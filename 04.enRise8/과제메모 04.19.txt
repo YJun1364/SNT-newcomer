@@ -1,0 +1,16 @@
+no
+title
+userDept
+userName
+boardName
+createDate
+content
+
+
+
+getLyjBoardList
+
+lyjBoardCnt
+메서드
+getTotalLyjBoardCount
+selectTotalLyjBoardCount

@@ -1,0 +1,365 @@
+(function(window, $, undefined) {
+	
+$.PageLoader.add("lyjBoardList", { 
+	load:function(hash){
+		this._hash = hash;
+		this.el = $("#content").load($ServerInfo.contextPath + "/apvl/list/lyjBoardList.do", hash.params||[], 
+				$.proxy(function(res, status){
+			this.setDefaultListParam();
+			$Globals.addParams(this.listParam, this._hash.params);
+			this.setlyjBoardListTable();
+			this.setSearchMenu();
+			this.bindEvent();
+		},this));
+	},
+	setDefaultListParam: function() {
+		this.listParam = [];
+		$Globals.addParam(this.listParam, "viewRowCnt", 10);
+		$Globals.addParam(this.listParam, "currentPage", 1);
+		$Globals.addParam(this.listParam, "sortField", "DRAFT_DT");
+		$Globals.addParam(this.listParam, "sortType", "DESC");
+		
+//		$Globals.addParam(this.listParam, "docTitle", "");
+//		$Globals.addParam(this.listParam, "classId", "ALL");
+//		$Globals.addParam(this.listParam, "drafterNm", "");
+//		$Globals.addParam(this.listParam, "drafterId", "");
+//		$Globals.addParam(this.listParam, "startDate", "");
+//		$Globals.addParam(this.listParam, "endDate", "");
+//		$Globals.addParam(this.listParam, "sendDocNumCd","");
+		$Globals.addParam(this.listParam, "no", "");
+		$Globals.addParam(this.listParam, "title", "");
+		$Globals.addParam(this.listParam, "userDept", "");
+		$Globals.addParam(this.listParam, "userName", "");
+		$Globals.addParam(this.listParam, "boardName", "");
+		$Globals.addParam(this.listParam, "createDate", "");
+		$Globals.addParam(this.listParam, "content", "");
+		
+		$Globals.addParam(this.listParam, "isSearch", false);
+	},
+	setSearchListParam: function() {
+		$Globals.addParam(this.listParam, "currentPage", 1);
+		$Globals.addParam(this.listParam, "docTitle", $("#docTitle", this.el).val());
+		$Globals.addParam(this.listParam, "classId", $("#classId option:selected", this.el).val());
+		$Globals.addParam(this.listParam, "drafterNm", $("#drafterNm", this.el).val());
+		$Globals.addParam(this.listParam, "startDate", $("#startDate", this.el).val());
+		$Globals.addParam(this.listParam, "endDate", $("#endDate", this.el).val());
+		$Globals.addParam(this.listParam, "sendDocNumCd", $("#sendDocNumCd", this.el).val());
+		$Globals.addParam(this.listParam, "isSearch", true);
+	},
+	
+	bindEvent:function(){
+		var _this = this;
+		
+		//조회
+		$("#btnFormSearch", _this.el).on("click", function(event){
+			event.preventDefault();
+			_this.setSearchListParam();
+			$.history.load($.PageLoader.makeHash("lyjBoardList", _this.listParam));			
+		});
+		
+		//초기화
+		$("#btnInitSearch", _this.el).on("click", function(event){
+			event.preventDefault();
+			_this.setDefaultListParam();
+			$.history.load($.PageLoader.makeHash("lyjBoardList", _this.listParam));
+		});
+		
+		$("#docTitle", _this.el).bind("keydown", function(event){
+			if(event.keyCode == $.ui.keyCode.ENTER){
+				event.preventDefault();
+				$("#btnFormSearch", _this.el).click();
+			}
+		});
+		
+		//사용자가 입력한 경우, Enter인 경우는 검색하고 아닌 경우는 수정이 발생되었으므로 조직도 선택 사용자는 삭제
+		$("#drafterNm", _this.el).bind("keydown", function(event){
+			if(event.keyCode == $.ui.keyCode.ENTER){
+				event.preventDefault();
+				$("#btnFormSearch", _this.el).click();
+			}else{
+				$Globals.addParam(_this.listParam, "drafterId", "");
+			}
+		});
+		
+		//달력
+		//시작일
+		$("#startDate",_this.el).datepicker({
+			showOn:"button",
+			buttonImage: $Globals.webRoot + "/images/UXDesign/icon/ic_cal.gif",
+			buttonImageOnly: true,
+			dateFormat:"yy-mm-dd",
+			onClose:function(selectedDate){
+				$("#endDate",_this.el).datepicker("option","minDate",selectedDate);
+			}
+		});
+		
+		//종료일
+		$("#endDate",_this.el).datepicker({
+			showOn:"button",
+			buttonImage: $Globals.webRoot + "/images/UXDesign/icon/ic_cal.gif",
+			buttonImageOnly: true,
+			dateFormat:"yy-mm-dd",
+			onClose:function(selectedDate){
+				$("#startDate",_this.el).datepicker("option","maxDate",selectedDate);
+			}
+		});
+		
+		//기안자
+		$("#btnSetOrgn", _this.el).orgnTreePopup({
+			/** 조직도 전자결재용 적용 - 2018.06.14 - cjw */
+			types: {
+				organ:{icon : "organ-icon"},
+				docsDept:{icon : "docs-dept-icon"},
+				dept:{icon : "dept-icon"},
+				delDept:{icon : "del-dept-icon"},
+				person:{icon : "person-icon", max_children: 0},
+				dutyPerson:{icon : "duty-person-icon", max_children: 0},
+				delPerson:{icon : "del-person-icon", max_children: 0},
+				rolePerson:{icon : "role-person"}
+			},
+			/** End DEV 조직도 전자결재용 적용 - 2018.06.14 - cjw */
+			dblclick: function(event, node){
+				if(node.type == "person" || node.type == "dutyPerson" || node.type == 'rolePerson') {
+					$("#drafterNm", _this.el).val(node.data.userNm);
+					$Globals.addParam(_this.listParam, "drafterId", node.data.userId);
+					return true;
+				}else{
+					$Globals.alert($Globals.getMessage("apvl.msg.errorSelectDept", "기관 및 부서는 선택할 수 없습니다"));
+					return false;
+				}
+			}
+		});
+		
+		//문서정보 --> 등록
+		$("#RegisteBtn").boardRegistePopup();//{
+//			beforeOpen: function(){
+//				var _checkedData = _this.inprogressList.getCheckedData("checkbox");
+//				if(_checkedData.length == 0){
+//					$Globals.alert($Globals.getMessage("apvl.msg.warnSelectDocument", "문서를 선택해 주세요"));
+//					return;
+//				}else{
+//					var _multiDocIds = [];
+//					for(var i = 0; i < _checkedData.length; i++){
+//						_multiDocIds.push(_checkedData[i].multiDocId);
+//					}
+//					$(this).docInfoPopup("option", "docIds",_multiDocIds);
+//				}
+//			}
+//	});
+		
+//		//결재현황
+//		$("#btnApprovalline").approvallineState({
+//			beforeOpen: function(){
+//				var _checkedData = _this.inprogressList.getCheckedData("checkbox");
+//				if(_checkedData.length == 0){
+//					$Globals.alert($Globals.getMessage("apvl.msg.warnSelectDocument", "문서를 선택해 주세요"));
+//					return false;
+//				}else{
+//					var _multiDocIds = [];
+//					var _docTitles = [];
+//					for(var i = 0; i < _checkedData.length; i++){
+//						_multiDocIds.push(_checkedData[i].multiDocId);
+//						_docTitles.push(_checkedData[i].docTitle);
+//					}
+//					$(this).approvallineState("option", "docIds",_multiDocIds);
+//					$(this).approvallineState("option", "docTitles",_docTitles);
+//				}
+//				return true;
+//			}
+//		});
+		
+		//이력정보 --> 수정
+		$("#btnTimeLinerInfo").docHistPopup({
+			beforeOpen: function(){
+				var _checkedData = _this.inprogressList.getCheckedData("checkbox");
+				if(_checkedData.length == 0){
+					$Globals.alert($Globals.getMessage("apvl.msg.warnSelectDocument", "문서를 선택해 주세요"));
+					return false;
+				}else{
+					var _multiDocIds = [];
+					var _docTitles = [];
+					var _isReceiptDraft = [];
+					for(var i = 0; i < _checkedData.length; i++){
+						_multiDocIds.push(_checkedData[i].multiDocId);
+						_docTitles.push(_checkedData[i].docTitle);
+						_isReceiptDraft.push(_checkedData[i].receiptDraftYn);
+					}
+					$(this).docHistPopup("option", "multiDocIds", _multiDocIds);
+					$(this).docHistPopup("option", "docTitles", _docTitles);
+					$(this).docHistPopup("option", "isReceiptDraft", _isReceiptDraft);
+				}
+				return true;
+			}
+		});
+		
+		//삭제
+		$("#btnDelete").on("click", function(event){
+			event.preventDefault();
+			var _checkedData = _this.inprogressList.getCheckedData("checkbox");
+			if(_checkedData.length == 0){
+				$Globals.alert($Globals.getMessage("jy.msg.warnSelectDocument","게시글을 선택해 주세요"));
+			}else{
+				var _params = [];
+				for(var i=0; i< _checkedData.length; i++){
+						
+					$Globals.appendParam(_params,"nos", _checkedData[i].no);										
+				}
+				$Globals.confirm($Globals.getMessage("jy.msg.infoConfirmDeleteDoc","해당 게시글를 삭제하시겠습니까?"), function(isYes){				
+					if(isYes){
+						$.delegate.docInfo.removeBoardList(_params,
+								function(res){
+									//필요시 hash 추가처리 해야함
+									$Globals.alert(res.message,function(){
+										$.history.load($.PageLoader.makeHash("jinyoungBoard",_this.listParam));
+									});
+								},
+								function(errorMap){
+									if(errorMap.exception){
+										$Globals.alert(errorMap.exception);
+									}else{
+										$.each(errorMap, function(key, value) {
+											$Globals.alert(value);	
+										});
+									}
+								}
+							);
+					}
+				});
+			}
+		}),
+		//인쇄
+		$("#btnPrint").printPopup({
+			title:"진행문서함",
+			url:_this.inprogressList.dataURL,
+			data:[{title:$Globals.getMessage("public.ui.category","분류"),fieldNm:"classNm"},
+                  {title:$Globals.getMessage("public.ui.subject","제목"),fieldNm:"docTitle"},
+                  {title:$Globals.getMessage("apvl.ui.drafter","기안자"),fieldNm:"drafterNm"},
+                  {title:$Globals.getMessage("apvl.ui.draftDt","기안일"),fieldNm:"draftDt"},
+                  {title:$Globals.getMessage("apvl.ui.currentApproverNm","현재결재자"),fieldNm:"currentApprover"},
+                  {title:$Globals.getMessage("public.ui.status","상태"),fieldNm:"docStatusNm"}],
+			beforeOpen:function(){
+				var _checkedData = _this.inprogressList.getAllRowData();
+				if(_checkedData.length == 0){
+					$Globals.alert($Globals.getMessage("public.msg.noPrintInfomation", "인쇄할 내용이 존재하지 않습니다"));
+					return false;
+				}else{
+					var _params = [];
+					$.extend(true, _params, _this.inprogressList.addDataParams);
+					
+					_params.push({name:"viewRowCnt", value:_this.inprogressList.viewRowCnt});
+					_params.push({name:"currentPage", value:_this.inprogressList.currentPage});
+					_params.push({name:"sortField", value:_this.inprogressList.sortField});
+					_params.push({name:"sortType", value:_this.inprogressList.sortType});
+					$(this).printPopup("option","params",_params);
+				}
+				return true;
+			}
+		});
+		
+		
+		//문서인쇄
+		$("#btnPrintDoc").on("click", function(event){
+			event.preventDefault();
+			var _checkedData = _this.inprogressList.getCheckedData("checkbox");
+			if(_checkedData.length == 0){
+				$Globals.alert($Globals.getMessage("apvl.msg.warnSelectDocument", "문서를 선택해 주세요"));
+				return false;
+			}else if(_checkedData.length > 1){
+				$Globals.alert($Globals.getMessage("aars.msg.warnOneSelectDocument","한개의 문서를 선택해주세요"));
+				return false;
+			}else{
+				
+				$Globals.openFormWindow("/apvl/popup/getPrintDoc.do?type=INPROGRESS&warning=Y&multiDocId="+_checkedData[0].multiDocId, "getPrintDoc"+$.now(), {width:836,height:748}, "location=no,status=yes,scrollbars=yes,resizable=no,menubar=no,toolbar=no");
+			}
+		});
+	},
+	
+	setlyjBoardListTable:function(){
+		var _this = this;
+		_this.inprogressList = $("#inprogressListTable").sntDataTable({
+			loadingText: $Globals.getMessage("apvl.msg.infoLoadInprogressList", "진행문서를 가져오는 중.."),
+			noTemplateId:"#inprogressListTableNoTemplate",
+			dataURL : "/ajax/apvl/list/getLyjBoardList.do",
+			viewRowCnt: $Globals.getParam(_this.listParam, "viewRowCnt"),
+			currentPage: $Globals.getParam(_this.listParam, "currentPage"),
+			sortField: $Globals.getParam(_this.listParam, "sortField"),
+			sortType: $Globals.getParam(_this.listParam, "sortType"),
+			addDataParams: [{name:"no", value:$Globals.getParam(_this.listParam, "no")},
+			                {name:"title", value:$Globals.getParam(_this.listParam, "title")},
+			                {name:"userDept", value:$Globals.getParam(_this.listParam, "userDept")},
+			                {name:"userName", value:$Globals.getParam(_this.listParam, "userName")},
+			                {name:"boardName", value:$Globals.getParam(_this.listParam, "boardName")},
+			                {name:"createDate", value:$Globals.getParam(_this.listParam, "createDate")},
+			                {name:"content", value:$Globals.getParam(_this.listParam, "content")}],
+	        onHashChange : function(type, data) {
+				if (type == "currentPage") {
+					$Globals.addParam(_this.listParam, "currentPage", this.currentPage);										
+				}else if (type == "sortField") {
+					$Globals.addParam(_this.listParam, "sortField", this.sortField);
+					$Globals.addParam(_this.listParam, "sortType", this.sortType);					
+				}
+				$.history.load($.PageLoader.makeHash("lyjBoardList", _this.listParam));
+			},
+			onLoad:function(jEl) {
+				$("#cntArea", _this.el).html(_this.inprogressList.getTotalCount());
+				jEl.on("click", "td a.docTitle", function(event){
+					event.preventDefault();
+					var _docLists = [];
+					var rowData = $(this).parents("tr").data("rowData");
+					var rowsData = $(this).parents("tr").siblings();
+					$.each(rowsData,function(idx){
+						var _data = $(this).data("rowData");
+						
+						if(idx == 0){
+							_docLists.push(rowData.multiDocId);
+						}
+						_docLists.push(_data.multiDocId);
+					});
+				});
+			},
+		});
+	},
+	setSearchMenu: function(){
+		var _docTitle = $Globals.getParam(this.listParam, "docTitle");
+		var _startDate = $Globals.getParam(this.listParam, "startDate");
+		var _endDate = $Globals.getParam(this.listParam, "endDate");
+		var _drafterNm = $Globals.getParam(this.listParam, "drafterNm");
+		var _classId = $Globals.getParam(this.listParam, "classId");
+		var _sendDocNumCd = $Globals.getParam(this.listParam, "sendDocNumCd");
+		
+		$("#docTitle", this.el).val(_docTitle);
+		$("#startDate", this.el).val(_startDate);
+		$("#endDate", this.el).val(_endDate);
+		$("#drafterNm", this.el).val(_drafterNm);
+		$("#classId", this.el).val(_classId);
+		$("#sendDocNumCd", this.el).val(_sendDocNumCd);
+		if($Globals.getParam(this.listParam, "isSearch")) {
+			$("#showSearchResult", this.el).removeClass("hidden");
+			$("#content_section_area", this.el).addClass("search-result-show");
+			var _strResult = [];
+			var _draftDt = "";
+			if(_startDate){
+				_draftDt = _startDate + " ~ ";
+			}
+			if(_endDate){
+				if(!_startDate){
+					_draftDt += " ~ ";
+				}
+				_draftDt += _endDate;
+			}
+			_strResult.push($Globals.getMessage("public.ui.subject", "제목")+
+				" : "+'<span class="search-content">'+(_docTitle?_docTitle:$Globals.getMessage("public.ui.all", "전체"))+"</span>");
+			_strResult.push($Globals.getMessage("apvl.ui.draftDt", "기안일")+
+				" : "+'<span class="search-content">'+(_draftDt?_draftDt:$Globals.getMessage("public.ui.all", "전체"))+"</span>");
+			_strResult.push($Globals.getMessage("public.ui.category", "분류")+
+				" : "+'<span class="search-content">'+$("#classId option[value="+_classId+"]", this.el).text()+"</span>");
+			_strResult.push($Globals.getMessage("apvl.ui.drafter", "기안자")+
+				" : "+'<span class="search-content">'+(_drafterNm?_drafterNm:$Globals.getMessage("public.ui.all", "전체"))+"</span>");
+			_strResult.push($Globals.getMessage("apvl.ui.documentNumber", "문서번호")+
+					" : "+'<span class="search-content">'+(_sendDocNumCd?_sendDocNumCd:$Globals.getMessage("public.ui.all", "전체"))+"</span>");
+			$("#showSearchResult", this.el).find("span").html(_strResult.join(", ").toString());
+		}
+	}		
+});
+	
+})(window, jQuery);
